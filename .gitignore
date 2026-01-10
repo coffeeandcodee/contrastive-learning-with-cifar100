@@ -1,0 +1,5 @@
+data/
+cifar100_data/
+region_descriptions.json
+region_descriptions.json.zip
+vg_text.txt
