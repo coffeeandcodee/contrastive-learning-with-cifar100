@@ -143,12 +143,21 @@ class ImageEncoder(nn.Module):
         
         #NOTE THIS TRAINING A PROJECTION
         #NOTE Also known as TRANSFER LEARNING. TAking an image model and making it work with text
+        # v5: Even bigger projection head
         self.projection = nn.Sequential(
-            nn.Linear(576, 512),    #NOTE EXPERIMENT WITH LAYERS
-            nn.BatchNorm1d(512),
-            nn.ReLU(inplace=True),
+            nn.Linear(576, 2048),
+            nn.LayerNorm(2048),          # Try LayerNorm instead of BatchNorm
+            nn.GELU(),                   # Smoother activation
+            nn.Dropout(0.2),
+            nn.Linear(2048, 1024),
+            nn.LayerNorm(1024),
+            nn.GELU(),
+            nn.Dropout(0.1),
+            nn.Linear(1024, 512),
+            nn.LayerNorm(512),
+            nn.GELU(),
             nn.Linear(512, proj_dim)
-        ).to(device)
+            ).to(device)
         #============================
 
     
