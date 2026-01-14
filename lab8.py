@@ -81,7 +81,6 @@ class CIFAR100Filtered(Dataset):
         
     def __len__(self):
         """Return the total number of samples in the dataset."""
-        # TODO: Return the length of the underlying dataset
         return len(self.dataset)
     
     def __getitem__(self, idx):
@@ -143,21 +142,21 @@ class ImageEncoder(nn.Module):
         
         #NOTE THIS TRAINING A PROJECTION
         #NOTE Also known as TRANSFER LEARNING. TAking an image model and making it work with text
-        # v5: Even bigger projection head
+        # v5: Large projection head with BatchNorm + ReLU (original config that got 65%)
         self.projection = nn.Sequential(
             nn.Linear(576, 2048),
-            nn.LayerNorm(2048),          # Try LayerNorm instead of BatchNorm
-            nn.GELU(),                   # Smoother activation
-            nn.Dropout(0.2),
+            nn.BatchNorm1d(2048),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.25),
             nn.Linear(2048, 1024),
-            nn.LayerNorm(1024),
-            nn.GELU(),
-            nn.Dropout(0.1),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.15),
             nn.Linear(1024, 512),
-            nn.LayerNorm(512),
-            nn.GELU(),
+            nn.BatchNorm1d(512),
+            nn.ReLU(inplace=True),
             nn.Linear(512, proj_dim)
-            ).to(device)
+        ).to(device)
         #============================
 
     

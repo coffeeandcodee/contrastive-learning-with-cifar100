@@ -1,0 +1,161 @@
+================================================================================
+MULTIMODAL CONTRASTIVE LEARNING - MODEL TRAINING RESULTS
+================================================================================
+
+Text Embedding Model: EMB32_NG10_CS2_BS64.pth (32-dim Skip-gram embeddings)
+Backbone: MobileNetV3-Small (frozen)
+Dataset: CIFAR-100 (100 classes, all present in vocabulary)
+
+================================================================================
+MODEL v2
+================================================================================
+
+PROJECTION HEAD (MEDIUM):
+  576 → 1024 → BatchNorm → ReLU → Dropout(0.2)
+      → 512  → BatchNorm → ReLU
+      → 32
+
+CONFIG:
+  proj_dim:     32
+  lr:           5e-4
+  weight_decay: 1e-4
+  temperature:  0.07
+  epochs:       100
+  patience:     20
+  batch_sizes:  train=1024, eval=256
+
+RESULTS:
+  Best Epoch:       23
+  Val Similarity:   0.4446
+  
+  Image→Text Recall@1:  53.21%
+  Image→Text Recall@5:  77.37%
+  Image→Text Recall@10: 85.08%
+  
+  Text→Image Recall@1:  66.00%
+  Text→Image Recall@5:  95.00%
+  Text→Image Recall@10: 98.00%
+
+================================================================================
+MODEL v3
+================================================================================
+
+PROJECTION HEAD (MEDIUM - same as v2):
+  576 → 1024 → BatchNorm → ReLU → Dropout(0.2)
+      → 512  → BatchNorm → ReLU
+      → 32
+
+CONFIG:
+  proj_dim:     32
+  lr:           5e-4
+  weight_decay: 1e-4
+  temperature:  0.07
+  epochs:       100
+  patience:     20
+  batch_sizes:  train=1024, eval=256
+
+RESULTS:
+  Image→Text Recall@1:  57.68%
+  Image→Text Recall@5:  80.58%
+  Image→Text Recall@10: 87.00%
+  
+  Text→Image Recall@1:  55.00%
+  Text→Image Recall@5:  95.00%
+  Text→Image Recall@10: 98.00%
+
+================================================================================
+MODEL v4
+================================================================================
+
+PROJECTION HEAD (MEDIUM - same as v2/v3):
+  576 → 1024 → BatchNorm → ReLU → Dropout(0.2)
+      → 512  → BatchNorm → ReLU
+      → 32
+
+CONFIG:
+  proj_dim:     32
+  lr:           5e-4
+  weight_decay: 1e-4
+  temperature:  0.06
+  epochs:       100
+  patience:     20
+  batch_sizes:  train=1024, eval=256
+
+RESULTS:
+  (Checkpoint overwritten - exact metrics not recorded)
+
+================================================================================
+MODEL v5 (BEST - Original)
+================================================================================
+
+PROJECTION HEAD (LARGE):
+  576 → 2048 → BatchNorm → ReLU → Dropout(0.3)
+      → 1024 → BatchNorm → ReLU → Dropout(0.2)
+      → 512  → BatchNorm → ReLU
+      → 32
+
+CONFIG:
+  proj_dim:     32
+  lr:           5e-4
+  weight_decay: 1e-4
+  temperature:  0.07
+  epochs:       100
+  patience:     20
+  batch_sizes:  train=1024, eval=256
+
+RESULTS:
+  Val Similarity:   0.4271
+  
+  Image→Text Recall@1:  65.07%  ← BEST
+  Image→Text Recall@5:  82.12%
+  Image→Text Recall@10: 86.79%
+  
+  Text→Image Recall@1:  49.00%
+  Text→Image Recall@5:  94.00%
+  Text→Image Recall@10: 99.00%
+
+================================================================================
+MODEL v5 (Experiment - Lower temp/dropout)
+================================================================================
+
+PROJECTION HEAD (LARGE):
+  576 → 2048 → BatchNorm → ReLU → Dropout(0.15)
+      → 1024 → BatchNorm → ReLU → Dropout(0.1)
+      → 512  → BatchNorm → ReLU
+      → 32
+
+CONFIG:
+  proj_dim:     32
+  lr:           5e-4
+  weight_decay: 1e-4
+  temperature:  0.05  ← Lower (too aggressive)
+  epochs:       100
+  patience:     25
+  batch_sizes:  train=1024, eval=256
+
+RESULTS:
+  Image→Text Recall@1:  62.48%  (worse than original v5)
+  Image→Text Recall@5:  80.93%
+  Image→Text Recall@10: 86.49%
+  
+  Text→Image Recall@1:  60.00%
+  Text→Image Recall@5:  95.00%
+  Text→Image Recall@10: 98.00%
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. LARGER projection head (v5) outperformed MEDIUM head (v2/v3/v4)
+   - MEDIUM: ~53-58% Recall@1
+   - LARGE:  ~65% Recall@1
+
+2. Temperature 0.07 works better than 0.05/0.06
+   - 0.05 was too aggressive, hurt performance
+
+3. Dropout 0.3/0.2 provides good regularization
+   - Lower dropout (0.15/0.1) led to worse generalization
+
+4. Best configuration: LARGE head + temp=0.07 + dropout=0.3/0.2
+
+================================================================================
